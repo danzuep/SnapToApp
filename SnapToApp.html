@@ -48,6 +48,18 @@
             }
         }
 
+        @media (prefers-color-scheme: dark) {
+            .flyout-menu {
+                background-color: var(--dark-flyout-bg) !important;
+            }
+                .flyout-menu input,
+                .flyout-menu select {
+                    background-color: var(--dark-input-bg) !important;
+                    border-color: var(--dark-border) !important;
+                    color: var(--dark-text) !important;
+                }
+        }
+
         body {
             background-color: var(--bg-primary);
             color: var(--text-primary);
@@ -68,9 +80,9 @@
             transition: all 0.3s ease;
         }
 
-        .upload-area:hover {
-            border-color: var(--primary-color);
-        }
+            .upload-area:hover {
+                border-color: var(--primary-color);
+            }
 
         .tab-active {
             border-bottom: 2px solid var(--primary-color);
@@ -272,7 +284,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- Generate Button -->
             <button id="generate-btn" class="mt-2 w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 disabled:bg-gray-400 disabled:cursor-not-allowed" disabled>
                 Generate Code
@@ -286,7 +298,7 @@
                     <button id="tab-preview" class="py-2 px-4 font-medium tab-active">Preview</button>
                     <button id="tab-code" class="py-2 px-4 font-medium">Generated Code</button>
                 </div>
-                
+
                 <!-- Preview Tab Content -->
                 <div id="preview-content" class="pt-4 flex-grow">
                     <div id="preview-placeholder" class="flex flex-col items-center justify-center p-8">
@@ -402,10 +414,10 @@
         });
 
         // Set up flyout menu handlers
-        menuButtons.forEach(({btn, menu, icon}) => {
+        menuButtons.forEach(({ btn, menu, icon }) => {
             btn.addEventListener('click', () => {
                 const isHidden = menu.classList.contains('hidden');
-                
+
                 // Close all menus first
                 menuButtons.forEach(item => {
                     item.menu.classList.add('hidden');
@@ -413,7 +425,7 @@
                     item.menu.style.opacity = '0';
                     item.icon.style.transform = '';
                 });
-                
+
                 // Then open the clicked one if it was closed
                 if (isHidden) {
                     menu.classList.remove('hidden');
@@ -458,7 +470,7 @@
         uploadContainer.addEventListener('drop', (e) => {
             e.preventDefault();
             uploadContainer.classList.remove('border-blue-500');
-            
+
             if (e.dataTransfer.files.length) {
                 handleFile(e.dataTransfer.files[0]);
             }
@@ -487,7 +499,7 @@
 
             uploadedImage = file;
             const reader = new FileReader();
-            
+
             reader.onload = (e) => {
                 imagePreview.src = e.target.result;
                 filenameDisplay.textContent = file.name;
@@ -495,7 +507,7 @@
                 uploadContainer.classList.add('hidden');
                 generateBtn.disabled = false;
             };
-            
+
             reader.readAsDataURL(file);
         }
 
@@ -550,54 +562,54 @@
             const docsContainer = document.getElementById('framework-docs');
             let docsHTML = '';
 
-            switch(framework) {
+            switch (framework) {
                 case 'NET MAUI':
                     docsHTML = `
-                        <h3 class="font-medium mb-2">.NET MAUI Resources:</h3>
-                        <ul class="space-y-1 text-sm">
-                            <li><a href="https://learn.microsoft.com/en-us/dotnet/maui/" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Official Documentation</a></li>
-                            <li><a href="https://learn.microsoft.com/en-us/dotnet/maui/get-started/installation" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Installation Guide</a></li>
-                            <li><a href="https://learn.microsoft.com/en-us/dotnet/maui/user-interface/controls/" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">UI Controls</a></li>
-                            <li><a href="https://learn.microsoft.com/en-us/dotnet/maui/android/deployment/" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Android Deployment</a></li>
-                            <li><a href="https://learn.microsoft.com/en-us/dotnet/maui/ios/deployment/" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">iOS Deployment</a></li>
-                        </ul>
-                    `;
+                            <h3 class="font-medium mb-2">.NET MAUI Resources:</h3>
+                            <ul class="space-y-1 text-sm">
+                                <li><a href="https://learn.microsoft.com/en-us/dotnet/maui/" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Official Documentation</a></li>
+                                <li><a href="https://learn.microsoft.com/en-us/dotnet/maui/get-started/installation" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Installation Guide</a></li>
+                                <li><a href="https://learn.microsoft.com/en-us/dotnet/maui/user-interface/controls/" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">UI Controls</a></li>
+                                <li><a href="https://learn.microsoft.com/en-us/dotnet/maui/android/deployment/" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Android Deployment</a></li>
+                                <li><a href="https://learn.microsoft.com/en-us/dotnet/maui/ios/deployment/" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">iOS Deployment</a></li>
+                            </ul>
+                        `;
                     break;
                 case 'Blazor Hybrid':
                     docsHTML = `
-                        <h3 class="font-medium mb-2">Blazor Hybrid Resources:</h3>
-                        <ul class="space-y-1 text-sm">
-                            <li><a href="https://learn.microsoft.com/en-us/aspnet/core/blazor/hybrid/" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Official Documentation</a></li>
-                            <li><a href="https://learn.microsoft.com/en-us/aspnet/core/blazor/hybrid/tutorials/maui" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Getting Started</a></li>
-                            <li><a href="https://learn.microsoft.com/en-us/aspnet/core/blazor/components/" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Components Reference</a></li>
-                            <li><a href="https://learn.microsoft.com/en-us/dotnet/maui/android/deployment/" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Android Deployment</a></li>
-                            <li><a href="https://learn.microsoft.com/en-us/dotnet/maui/ios/deployment/" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">iOS Deployment</a></li>
-                        </ul>
-                    `;
+                            <h3 class="font-medium mb-2">Blazor Hybrid Resources:</h3>
+                            <ul class="space-y-1 text-sm">
+                                <li><a href="https://learn.microsoft.com/en-us/aspnet/core/blazor/hybrid/" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Official Documentation</a></li>
+                                <li><a href="https://learn.microsoft.com/en-us/aspnet/core/blazor/hybrid/tutorials/maui" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Getting Started</a></li>
+                                <li><a href="https://learn.microsoft.com/en-us/aspnet/core/blazor/components/" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Components Reference</a></li>
+                                <li><a href="https://learn.microsoft.com/en-us/dotnet/maui/android/deployment/" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Android Deployment</a></li>
+                                <li><a href="https://learn.microsoft.com/en-us/dotnet/maui/ios/deployment/" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">iOS Deployment</a></li>
+                            </ul>
+                        `;
                     break;
                 case 'Flutter':
                     docsHTML = `
-                        <h3 class="font-medium mb-2">Flutter Resources:</h3>
-                        <ul class="space-y-1 text-sm">
-                            <li><a href="https://flutter.dev/docs" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Official Documentation</a></li>
-                            <li><a href="https://flutter.dev/docs/get-started/install" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Installation Guide</a></li>
-                            <li><a href="https://flutter.dev/docs/development/ui/widgets-intro" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Widget Catalog</a></li>
-                            <li><a href="https://flutter.dev/docs/deployment/android" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Android Deployment</a></li>
-                            <li><a href="https://flutter.dev/docs/deployment/ios" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">iOS Deployment</a></li>
-                        </ul>
-                    `;
+                            <h3 class="font-medium mb-2">Flutter Resources:</h3>
+                            <ul class="space-y-1 text-sm">
+                                <li><a href="https://flutter.dev/docs" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Official Documentation</a></li>
+                                <li><a href="https://flutter.dev/docs/get-started/install" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Installation Guide</a></li>
+                                <li><a href="https://flutter.dev/docs/development/ui/widgets-intro" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Widget Catalog</a></li>
+                                <li><a href="https://flutter.dev/docs/deployment/android" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Android Deployment</a></li>
+                                <li><a href="https://flutter.dev/docs/deployment/ios" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">iOS Deployment</a></li>
+                            </ul>
+                        `;
                     break;
                 case 'React Native':
                     docsHTML = `
-                        <h3 class="font-medium mb-2">React Native Resources:</h3>
-                        <ul class="space-y-1 text-sm">
-                            <li><a href="https://reactnative.dev/docs/getting-started" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Official Documentation</a></li>
-                            <li><a href="https://reactnative.dev/docs/environment-setup" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Environment Setup</a></li>
-                            <li><a href="https://reactnative.dev/docs/components-and-apis" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Components and APIs</a></li>
-                            <li><a href="https://reactnative.dev/docs/signed-apk-android" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Android Deployment</a></li>
-                            <li><a href="https://reactnative.dev/docs/publishing-to-app-store" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">iOS Deployment</a></li>
-                        </ul>
-                    `;
+                            <h3 class="font-medium mb-2">React Native Resources:</h3>
+                            <ul class="space-y-1 text-sm">
+                                <li><a href="https://reactnative.dev/docs/getting-started" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Official Documentation</a></li>
+                                <li><a href="https://reactnative.dev/docs/environment-setup" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Environment Setup</a></li>
+                                <li><a href="https://reactnative.dev/docs/components-and-apis" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Components and APIs</a></li>
+                                <li><a href="https://reactnative.dev/docs/signed-apk-android" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Android Deployment</a></li>
+                                <li><a href="https://reactnative.dev/docs/publishing-to-app-store" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">iOS Deployment</a></li>
+                            </ul>
+                        `;
                     break;
             }
 
@@ -645,7 +657,7 @@ Respond with multiple code blocks for different files, each clearly labeled with
 
                 // Create a File object from the uploaded image
                 const file = uploadedImage;
-                
+
                 // Send the user message with the image attachment
                 await window.Poe.sendUserMessage(prompt, {
                     attachments: [file],
@@ -656,7 +668,7 @@ Respond with multiple code blocks for different files, each clearly labeled with
             } catch (error) {
                 hideLoading();
                 console.error('Error sending message:', error);
-                
+
                 if (error.errorType === 'USER_REJECTED_CONFIRMATION') {
                     alert('You need to allow Poe to access external resources for this functionality.');
                 } else {
@@ -670,13 +682,13 @@ Respond with multiple code blocks for different files, each clearly labeled with
             // Extract file content from markdown response
             const fileRegex = /```(?:(\w+)\s+)?(?:(?:\/\/|#) ([\w\/\-\.]+)\s*?|\s*?)([\s\S]*?)```/g;
             const files = [];
-            
+
             let match;
             while ((match = fileRegex.exec(content)) !== null) {
                 const lang = match[1] || '';
                 const filename = match[2] || `file${files.length + 1}.${getDefaultExtension(framework, lang)}`;
                 const code = match[3];
-                
+
                 files.push({
                     filename,
                     lang: lang || getLanguageFromFilename(filename),
@@ -696,12 +708,12 @@ Respond with multiple code blocks for different files, each clearly labeled with
 
             generatedFiles = files;
             currentFileIndex = 0;
-            
+
             // Update the UI
             updateFilesDropdown();
             updateCodeDisplay();
             generatePreview(files, framework);
-            
+
             // Show the code tab
             tabCode.click();
         }
@@ -712,10 +724,10 @@ Respond with multiple code blocks for different files, each clearly labeled with
                 fileSelector.classList.add('hidden');
             } else {
                 fileSelector.classList.remove('hidden');
-                
+
                 // Clear existing options
                 fileDropdown.innerHTML = '';
-                
+
                 // Add new options
                 generatedFiles.forEach((file, index) => {
                     const option = document.createElement('option');
@@ -733,17 +745,17 @@ Respond with multiple code blocks for different files, each clearly labeled with
                 codeResult.classList.add('hidden');
                 return;
             }
-            
+
             const file = generatedFiles[currentFileIndex];
             currentFile.textContent = file.filename;
-            
+
             // Set the code and language for syntax highlighting
             codeDisplay.textContent = file.code;
             codeDisplay.className = `language-${file.lang}`;
-            
+
             // Apply syntax highlighting
             hljs.highlightElement(codeDisplay);
-            
+
             // Show the code result section
             codePlaceholder.classList.add('hidden');
             codeResult.classList.remove('hidden');
@@ -752,7 +764,7 @@ Respond with multiple code blocks for different files, each clearly labeled with
         // Generate a preview of the UI based on the framework
         function generatePreview(files, framework) {
             const previewHtml = createPreviewHtml(files, framework);
-            
+
             previewResult.innerHTML = previewHtml;
             previewPlaceholder.classList.add('hidden');
             previewResult.classList.remove('hidden');
@@ -763,9 +775,9 @@ Respond with multiple code blocks for different files, each clearly labeled with
         function createPreviewHtml(files, framework) {
             // For this demo, we'll just show a mockup preview
             let previewImagePath;
-            
+
             // Base the mockup on the selected framework
-            switch(framework) {
+            switch (framework) {
                 case 'NET MAUI':
                 case 'Blazor Hybrid':
                     previewImagePath = 'https://i.imgur.com/xp7QIoM.png'; // .NET logo placeholder
@@ -779,25 +791,25 @@ Respond with multiple code blocks for different files, each clearly labeled with
                 default:
                     previewImagePath = 'https://i.imgur.com/JzpTQWv.png';
             }
-            
+
             // Create a simplified preview with the uploaded image and a framework overlay
             return `
-                <div class="flex flex-col items-center p-4">
-                    <h3 class="text-lg font-medium mb-4">Preview (${framework})</h3>
-                    <div class="relative border-2 border-gray-300 rounded-xl p-1 shadow-lg" style="max-width: 300px;">
-                        <div class="relative">
-                            <img src="${imagePreview.src}" class="rounded-lg max-w-full" alt="Original UI">
-                            <div class="absolute bottom-2 right-2 bg-white dark:bg-gray-800 p-1 rounded-lg shadow-md">
-                                <img src="${previewImagePath}" class="h-8 w-8" alt="${framework} Logo">
+                    <div class="flex flex-col items-center p-4">
+                        <h3 class="text-lg font-medium mb-4">Preview (${framework})</h3>
+                        <div class="relative border-2 border-gray-300 rounded-xl p-1 shadow-lg" style="max-width: 300px;">
+                            <div class="relative">
+                                <img src="${imagePreview.src}" class="rounded-lg max-w-full" alt="Original UI">
+                                <div class="absolute bottom-2 right-2 bg-white dark:bg-gray-800 p-1 rounded-lg shadow-md">
+                                    <img src="${previewImagePath}" class="h-8 w-8" alt="${framework} Logo">
+                                </div>
                             </div>
                         </div>
+                        <p class="mt-4 text-sm text-center text-gray-600 dark:text-gray-400">
+                            This is a representation of how your UI would look in ${framework}.<br>
+                            The actual implementation may vary based on the framework's capabilities.
+                        </p>
                     </div>
-                    <p class="mt-4 text-sm text-center text-gray-600 dark:text-gray-400">
-                        This is a representation of how your UI would look in ${framework}.<br>
-                        The actual implementation may vary based on the framework's capabilities.
-                    </p>
-                </div>
-            `;
+                `;
         }
 
         // Helper functions to determine file extensions and languages
@@ -805,8 +817,8 @@ Respond with multiple code blocks for different files, each clearly labeled with
             if (lang) {
                 return getExtensionFromLanguage(lang);
             }
-            
-            switch(framework) {
+
+            switch (framework) {
                 case 'NET MAUI':
                     return 'xaml';
                 case 'Blazor Hybrid':
@@ -837,7 +849,7 @@ Respond with multiple code blocks for different files, each clearly labeled with
                 'html': 'html',
                 'css': 'css'
             };
-            
+
             return langMap[lang.toLowerCase()] || 'txt';
         }
 
@@ -860,7 +872,7 @@ Respond with multiple code blocks for different files, each clearly labeled with
                 'html': 'html',
                 'css': 'css'
             };
-            
+
             return extMap[ext.toLowerCase()] || 'plaintext';
         }
 
