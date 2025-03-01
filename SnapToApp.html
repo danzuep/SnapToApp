@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snap to App - UI Code Generator</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #5D5CDE;
+            --primary-hover: #4b4ab6;
+            --light-bg: #FFFFFF;
+            --light-text: #333333;
+            --dark-bg: #181818;
+            --dark-text: #E0E0E0;
+            --light-border: #e5e7eb;
+            --dark-border: #3a3a3a;
+            --light-card: #f9fafb;
+            --dark-card: #252525;
+            --light-flyout-bg: #f9fafb;
+            --dark-flyout-bg: #1e1e1e;
+            --light-input-bg: #ffffff;
+            --dark-input-bg: #2d2d2d;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .theme-toggle {
+                --bg-primary: var(--dark-bg);
+                --text-primary: var(--dark-text);
+                --border-color: var(--dark-border);
+                --card-bg: var(--dark-card);
+                --flyout-bg: var(--dark-flyout-bg);
+                --input-bg: var(--dark-input-bg);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .theme-toggle {
+                --bg-primary: var(--light-bg);
+                --text-primary: var(--light-text);
+                --border-color: var(--light-border);
+                --card-bg: var(--light-card);
+                --flyout-bg: var(--light-flyout-bg);
+                --input-bg: var(--light-input-bg);
+            }
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        .flyout-menu {
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+        }
+
+        .upload-area {
+            border: 2px dashed var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .upload-area:hover {
+            border-color: var(--primary-color);
+        }
+
+        .tab-active {
+            border-bottom: 2px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        /* Animation for the preview area */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .preview-fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        /* Custom scrollbar */
+        .code-container::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        .code-container::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .code-container::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 4px;
+        }
+
+        /* Trim long filenames */
+        .filename-display {
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body class="theme-toggle min-h-screen flex flex-col p-4">
+    <header class="mb-6">
+        <h1 class="text-2xl font-bold text-center">Snap to App - UI Code Generator</h1>
+    </header>
+
+    <main class="flex-grow flex flex-col lg:flex-row gap-4">
+        <!-- Left Column: Upload and Options -->
+        <div class="lg:w-1/3 flex flex-col gap-4">
+            <!-- Upload Area -->
+            <div class="card rounded-lg p-4">
+                <div id="upload-container" class="upload-area rounded-lg p-8 flex flex-col items-center justify-center cursor-pointer">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <p class="text-center mb-2">Drag and drop a UI image or click to browse</p>
+                    <p class="text-sm text-gray-500 text-center">Supported formats: JPG, PNG</p>
+                    <input type="file" id="file-input" class="hidden" accept="image/jpeg, image/png, image/gif">
+                </div>
+                <div id="image-preview-container" class="hidden mt-4 flex flex-col items-center">
+                    <div class="relative">
+                        <img id="image-preview" class="max-w-full rounded-lg" src="" alt="Uploaded UI">
+                        <button id="remove-image" class="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 focus:outline-none">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    </div>
+                    <p id="filename-display" class="filename-display mt-2 text-sm"></p>
+                </div>
+            </div>
+
+            <!-- Flyout Menus -->
+            <div class="card rounded-lg overflow-hidden">
+                <!-- Framework Selection -->
+                <div class="border-b border-gray-200 dark:border-gray-700">
+                    <button id="framework-btn" class="w-full p-4 text-left font-medium flex justify-between items-center">
+                        <span>Framework</span>
+                        <svg id="framework-icon" class="h-5 w-5 transform transition-transform" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 111.414 1.414l-4 4a1 1 01-1.414 0l-4-4a1 1 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                    <div id="framework-menu" class="flyout-menu hidden p-4 bg-gray-50 dark:bg-gray-900 transform origin-top scale-y-0 opacity-0">
+                        <div class="space-y-2">
+                            <label class="flex items-center">
+                                <input type="radio" name="framework" value="NET MAUI" class="mr-2">
+                                .NET MAUI
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="framework" value="Blazor Hybrid" class="mr-2">
+                                Blazor Hybrid
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="framework" value="Flutter" class="mr-2" checked>
+                                Flutter
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="framework" value="React Native" class="mr-2">
+                                React Native
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- LLM Selection -->
+                <div class="border-b border-gray-200 dark:border-gray-700">
+                    <button id="llm-btn" class="w-full p-4 text-left font-medium flex justify-between items-center">
+                        <span>Language Model</span>
+                        <svg id="llm-icon" class="h-5 w-5 transform transition-transform" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                    <div id="llm-menu" class="flyout-menu hidden p-4 bg-gray-50 dark:bg-gray-900 transform origin-top scale-y-0 opacity-0">
+                        <div class="space-y-2">
+                            <label class="flex items-center">
+                                <input type="radio" name="llm" value="o3-mini" class="mr-2" checked>
+                                @o3-mini
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="llm" value="Claude-3.7-Sonnet" class="mr-2">
+                                @Claude-3.7-Sonnet
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="llm" value="GPT-4o" class="mr-2">
+                                @GPT-4o
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Customization Parameters -->
+                <div class="border-b border-gray-200 dark:border-gray-700">
+                    <button id="params-btn" class="w-full p-4 text-left font-medium flex justify-between items-center">
+                        <span>Customization</span>
+                        <svg id="params-icon" class="h-5 w-5 transform transition-transform" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                    <div id="params-menu" class="flyout-menu hidden p-4 bg-gray-50 dark:bg-gray-900 transform origin-top scale-y-0 opacity-0">
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Styling Options</label>
+                                <select id="styling-option" class="w-full p-2 border rounded bg-white dark:bg-gray-700 text-base">
+                                    <option value="default">Default Style</option>
+                                    <option value="material">Material Design</option>
+                                    <option value="ios">iOS/Cupertino Style</option>
+                                    <option value="minimal">Minimal/Custom Style</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Layout Preference</label>
+                                <select id="layout-pref" class="w-full p-2 border rounded bg-white dark:bg-gray-700 text-base">
+                                    <option value="responsive">Responsive (adapt to all screens)</option>
+                                    <option value="mobile">Mobile Optimized</option>
+                                    <option value="tablet">Tablet Optimized</option>
+                                    <option value="desktop">Desktop Optimized</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Regional Support</label>
+                                <select id="regional-support" class="w-full p-2 border rounded bg-white dark:bg-gray-700 text-base">
+                                    <option value="en-US">English (US)</option>
+                                    <option value="en-GB">English (UK)</option>
+                                    <option value="es">Spanish</option>
+                                    <option value="fr">French</option>
+                                    <option value="de">German</option>
+                                    <option value="zh">Chinese</option>
+                                    <option value="ja">Japanese</option>
+                                    <option value="ru">Russian</option>
+                                    <option value="ar">Arabic</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">API Host URL (Optional)</label>
+                                <input type="text" id="api-host" placeholder="https://api.example.com" class="w-full p-2 border rounded bg-white dark:bg-gray-700 text-base">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Documentation Links -->
+                <div>
+                    <button id="docs-btn" class="w-full p-4 text-left font-medium flex justify-between items-center">
+                        <span>Documentation & Tutorials</span>
+                        <svg id="docs-icon" class="h-5 w-5 transform transition-transform" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                    <div id="docs-menu" class="flyout-menu hidden p-4 bg-gray-50 dark:bg-gray-900 transform origin-top scale-y-0 opacity-0">
+                        <div id="framework-docs">
+                            <h3 class="font-medium mb-2">Flutter Resources:</h3>
+                            <ul class="space-y-1 text-sm">
+                                <li><a href="https://flutter.dev/docs" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Official Documentation</a></li>
+                                <li><a href="https://flutter.dev/docs/get-started/install" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Installation Guide</a></li>
+                                <li><a href="https://flutter.dev/docs/development/ui/widgets-intro" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Widget Catalog</a></li>
+                                <li><a href="https://flutter.dev/docs/deployment/android" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Android Deployment</a></li>
+                                <li><a href="https://flutter.dev/docs/deployment/ios" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">iOS Deployment</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Generate Button -->
+            <button id="generate-btn" class="mt-2 w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 disabled:bg-gray-400 disabled:cursor-not-allowed" disabled>
+                Generate Code
+            </button>
+        </div>
+
+        <!-- Right Column: Preview and Code -->
+        <div class="lg:w-2/3 flex flex-col gap-4">
+            <div class="card rounded-lg p-4">
+                <div class="flex border-b border-gray-200 dark:border-gray-700">
+                    <button id="tab-preview" class="py-2 px-4 font-medium tab-active">Preview</button>
+                    <button id="tab-code" class="py-2 px-4 font-medium">Generated Code</button>
+                </div>
+                
+                <!-- Preview Tab Content -->
+                <div id="preview-content" class="pt-4 flex-grow">
+                    <div id="preview-placeholder" class="flex flex-col items-center justify-center p-8">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                        <p class="text-center">Upload a UI image and generate code to see the preview</p>
+                    </div>
+                    <div id="preview-result" class="hidden">
+                        <!-- Preview UI will be shown here -->
+                    </div>
+                </div>
+
+                <!-- Code Tab Content -->
+                <div id="code-content" class="hidden pt-4 flex-grow">
+                    <div id="code-placeholder" class="flex flex-col items-center justify-center p-8">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                        </svg>
+                        <p class="text-center">Upload a UI image and generate code to see the result</p>
+                    </div>
+                    <div id="code-result" class="hidden">
+                        <div class="flex justify-between items-center mb-2">
+                            <div class="flex items-center">
+                                <span id="current-file" class="font-medium"></span>
+                                <div id="file-selector" class="ml-4 hidden">
+                                    <select id="file-dropdown" class="p-1 text-sm border rounded bg-white dark:bg-gray-700">
+                                        <!-- File options will be inserted here -->
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button id="copy-code" class="text-sm py-1 px-3 bg-gray-200 dark:bg-gray-700 rounded hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none">
+                                    Copy
+                                </button>
+                                <button id="download-code" class="text-sm py-1 px-3 bg-gray-200 dark:bg-gray-700 rounded hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none">
+                                    Download
+                                </button>
+                            </div>
+                        </div>
+                        <div class="code-container bg-gray-800 rounded-lg p-4 overflow-auto max-h-96">
+                            <pre><code id="code-display" class="language-dart"></code></pre>
+                        </div>
+                        <div class="mt-4 p-4 bg-yellow-50 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 rounded-lg">
+                            <p class="text-sm"><strong>Note:</strong> To save this code, use the Copy button above and paste it into your IDE. Right-click on the code block and select "Copy" if the button doesn't work.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-sm w-full">
+            <div class="flex items-center justify-center mb-4">
+                <svg class="animate-spin h-8 w-8 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+            </div>
+            <p id="loading-message" class="text-center">Generating code from your UI image...</p>
+        </div>
+    </div>
+
+    <script>
+        // Initialize variables
+        let uploadedImage = null;
+        let generatedFiles = [];
+        let currentFileIndex = 0;
+
+        // DOM element references
+        const uploadContainer = document.getElementById('upload-container');
+        const fileInput = document.getElementById('file-input');
+        const imagePreviewContainer = document.getElementById('image-preview-container');
+        const imagePreview = document.getElementById('image-preview');
+        const filenameDisplay = document.getElementById('filename-display');
+        const removeImageBtn = document.getElementById('remove-image');
+        const generateBtn = document.getElementById('generate-btn');
+        const previewPlaceholder = document.getElementById('preview-placeholder');
+        const previewResult = document.getElementById('preview-result');
+        const codePlaceholder = document.getElementById('code-placeholder');
+        const codeResult = document.getElementById('code-result');
+        const codeDisplay = document.getElementById('code-display');
+        const currentFile = document.getElementById('current-file');
+        const fileSelector = document.getElementById('file-selector');
+        const fileDropdown = document.getElementById('file-dropdown');
+        const copyCodeBtn = document.getElementById('copy-code');
+        const downloadCodeBtn = document.getElementById('download-code');
+        const loadingOverlay = document.getElementById('loading-overlay');
+        const loadingMessage = document.getElementById('loading-message');
+
+        // Tab navigation
+        const tabPreview = document.getElementById('tab-preview');
+        const tabCode = document.getElementById('tab-code');
+        const previewContent = document.getElementById('preview-content');
+        const codeContent = document.getElementById('code-content');
+
+        // Flyout menu references
+        const menuButtons = [
+            { btn: document.getElementById('framework-btn'), menu: document.getElementById('framework-menu'), icon: document.getElementById('framework-icon') },
+            { btn: document.getElementById('llm-btn'), menu: document.getElementById('llm-menu'), icon: document.getElementById('llm-icon') },
+            { btn: document.getElementById('params-btn'), menu: document.getElementById('params-menu'), icon: document.getElementById('params-icon') },
+            { btn: document.getElementById('docs-btn'), menu: document.getElementById('docs-menu'), icon: document.getElementById('docs-icon') }
+        ];
+
+        // Initialize documentation link handlers
+        updateFrameworkDocs('Flutter');
+        document.querySelectorAll('input[name="framework"]').forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                updateFrameworkDocs(e.target.value);
+            });
+        });
+
+        // Set up flyout menu handlers
+        menuButtons.forEach(({btn, menu, icon}) => {
+            btn.addEventListener('click', () => {
+                const isHidden = menu.classList.contains('hidden');
+                
+                // Close all menus first
+                menuButtons.forEach(item => {
+                    item.menu.classList.add('hidden');
+                    item.menu.style.transform = 'scaleY(0)';
+                    item.menu.style.opacity = '0';
+                    item.icon.style.transform = '';
+                });
+                
+                // Then open the clicked one if it was closed
+                if (isHidden) {
+                    menu.classList.remove('hidden');
+                    setTimeout(() => {
+                        menu.style.transform = 'scaleY(1)';
+                        menu.style.opacity = '1';
+                        icon.style.transform = 'rotate(180deg)';
+                    }, 10);
+                }
+            });
+        });
+
+        // Tab switching logic
+        tabPreview.addEventListener('click', () => {
+            tabPreview.classList.add('tab-active');
+            tabCode.classList.remove('tab-active');
+            previewContent.classList.remove('hidden');
+            codeContent.classList.add('hidden');
+        });
+
+        tabCode.addEventListener('click', () => {
+            tabCode.classList.add('tab-active');
+            tabPreview.classList.remove('tab-active');
+            codeContent.classList.remove('hidden');
+            previewContent.classList.add('hidden');
+        });
+
+        // Image upload functionality
+        uploadContainer.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        uploadContainer.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadContainer.classList.add('border-blue-500');
+        });
+
+        uploadContainer.addEventListener('dragleave', () => {
+            uploadContainer.classList.remove('border-blue-500');
+        });
+
+        uploadContainer.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadContainer.classList.remove('border-blue-500');
+            
+            if (e.dataTransfer.files.length) {
+                handleFile(e.dataTransfer.files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        removeImageBtn.addEventListener('click', () => {
+            uploadedImage = null;
+            imagePreviewContainer.classList.add('hidden');
+            fileInput.value = '';
+            generateBtn.disabled = true;
+            uploadContainer.classList.remove('hidden');
+        });
+
+        // Function to handle file upload
+        function handleFile(file) {
+            if (!file.type.match('image.*')) {
+                alert('Please upload an image file');
+                return;
+            }
+
+            uploadedImage = file;
+            const reader = new FileReader();
+            
+            reader.onload = (e) => {
+                imagePreview.src = e.target.result;
+                filenameDisplay.textContent = file.name;
+                imagePreviewContainer.classList.remove('hidden');
+                uploadContainer.classList.add('hidden');
+                generateBtn.disabled = false;
+            };
+            
+            reader.readAsDataURL(file);
+        }
+
+        // Generate code button handler
+        generateBtn.addEventListener('click', async () => {
+            if (!uploadedImage) {
+                alert('Please upload an image first');
+                return;
+            }
+
+            showLoading('Analyzing your UI image...');
+
+            try {
+                await generateCode();
+            } catch (error) {
+                console.error('Error generating code:', error);
+                hideLoading();
+                alert('An error occurred while generating code. Please try again.');
+            }
+        });
+
+        // Copy code button handler
+        copyCodeBtn.addEventListener('click', () => {
+            const code = codeDisplay.textContent;
+            navigator.clipboard.writeText(code)
+                .then(() => {
+                    const originalText = copyCodeBtn.textContent;
+                    copyCodeBtn.textContent = 'Copied!';
+                    setTimeout(() => {
+                        copyCodeBtn.textContent = originalText;
+                    }, 2000);
+                })
+                .catch(err => {
+                    console.error('Failed to copy code:', err);
+                    alert('Please use right-click and "Copy" instead.');
+                });
+        });
+
+        // Download code button handler
+        downloadCodeBtn.addEventListener('click', () => {
+            alert('Due to browser security restrictions, please use the Copy button and save the code manually in your IDE.');
+        });
+
+        // File selector handler
+        fileDropdown.addEventListener('change', (e) => {
+            currentFileIndex = parseInt(e.target.value);
+            updateCodeDisplay();
+        });
+
+        // Function to update documentation links based on selected framework
+        function updateFrameworkDocs(framework) {
+            const docsContainer = document.getElementById('framework-docs');
+            let docsHTML = '';
+
+            switch(framework) {
+                case 'NET MAUI':
+                    docsHTML = `
+                        <h3 class="font-medium mb-2">.NET MAUI Resources:</h3>
+                        <ul class="space-y-1 text-sm">
+                            <li><a href="https://learn.microsoft.com/en-us/dotnet/maui/" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Official Documentation</a></li>
+                            <li><a href="https://learn.microsoft.com/en-us/dotnet/maui/get-started/installation" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Installation Guide</a></li>
+                            <li><a href="https://learn.microsoft.com/en-us/dotnet/maui/user-interface/controls/" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">UI Controls</a></li>
+                            <li><a href="https://learn.microsoft.com/en-us/dotnet/maui/android/deployment/" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Android Deployment</a></li>
+                            <li><a href="https://learn.microsoft.com/en-us/dotnet/maui/ios/deployment/" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">iOS Deployment</a></li>
+                        </ul>
+                    `;
+                    break;
+                case 'Blazor Hybrid':
+                    docsHTML = `
+                        <h3 class="font-medium mb-2">Blazor Hybrid Resources:</h3>
+                        <ul class="space-y-1 text-sm">
+                            <li><a href="https://learn.microsoft.com/en-us/aspnet/core/blazor/hybrid/" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Official Documentation</a></li>
+                            <li><a href="https://learn.microsoft.com/en-us/aspnet/core/blazor/hybrid/tutorials/maui" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Getting Started</a></li>
+                            <li><a href="https://learn.microsoft.com/en-us/aspnet/core/blazor/components/" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Components Reference</a></li>
+                            <li><a href="https://learn.microsoft.com/en-us/dotnet/maui/android/deployment/" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Android Deployment</a></li>
+                            <li><a href="https://learn.microsoft.com/en-us/dotnet/maui/ios/deployment/" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">iOS Deployment</a></li>
+                        </ul>
+                    `;
+                    break;
+                case 'Flutter':
+                    docsHTML = `
+                        <h3 class="font-medium mb-2">Flutter Resources:</h3>
+                        <ul class="space-y-1 text-sm">
+                            <li><a href="https://flutter.dev/docs" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Official Documentation</a></li>
+                            <li><a href="https://flutter.dev/docs/get-started/install" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Installation Guide</a></li>
+                            <li><a href="https://flutter.dev/docs/development/ui/widgets-intro" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Widget Catalog</a></li>
+                            <li><a href="https://flutter.dev/docs/deployment/android" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Android Deployment</a></li>
+                            <li><a href="https://flutter.dev/docs/deployment/ios" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">iOS Deployment</a></li>
+                        </ul>
+                    `;
+                    break;
+                case 'React Native':
+                    docsHTML = `
+                        <h3 class="font-medium mb-2">React Native Resources:</h3>
+                        <ul class="space-y-1 text-sm">
+                            <li><a href="https://reactnative.dev/docs/getting-started" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Official Documentation</a></li>
+                            <li><a href="https://reactnative.dev/docs/environment-setup" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Environment Setup</a></li>
+                            <li><a href="https://reactnative.dev/docs/components-and-apis" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Components and APIs</a></li>
+                            <li><a href="https://reactnative.dev/docs/signed-apk-android" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Android Deployment</a></li>
+                            <li><a href="https://reactnative.dev/docs/publishing-to-app-store" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">iOS Deployment</a></li>
+                        </ul>
+                    `;
+                    break;
+            }
+
+            docsContainer.innerHTML = docsHTML;
+        }
+
+        // Function to generate code using Poe API
+        async function generateCode() {
+            // Get selected options
+            const selectedFramework = document.querySelector('input[name="framework"]:checked').value;
+            const selectedLLM = document.querySelector('input[name="llm"]:checked').value;
+            const stylingOption = document.getElementById('styling-option').value;
+            const layoutPref = document.getElementById('layout-pref').value;
+            const regionalSupport = document.getElementById('regional-support').value;
+            const apiHost = document.getElementById('api-host').value;
+
+            updateLoadingMessage('Generating code...');
+
+            // Register handler for the bot response
+            const handlerId = 'code-generation-handler';
+            window.Poe.registerHandler(handlerId, (result) => {
+                if (result.status === 'complete') {
+                    processGeneratedCode(result.responses[0].content, selectedFramework);
+                    hideLoading();
+                } else if (result.status === 'error') {
+                    hideLoading();
+                    alert('Error generating code: ' + result.responses[0]?.statusText || 'Unknown error');
+                }
+            });
+
+            try {
+                // Create a formatted prompt
+                const prompt = `@${selectedLLM} I have a UI design that I want to convert to ${selectedFramework} code. Please analyze this image and generate the code to recreate this interface.
+
+Additional specifications:
+- Framework: ${selectedFramework}
+- Styling: ${stylingOption}
+- Layout: ${layoutPref}
+- Regional Support: ${regionalSupport}
+${apiHost ? `- API Host URL: ${apiHost}` : ''}
+
+Please provide a complete implementation with all necessary files and code to recreate this UI. Ensure the code is well-structured, follows best practices, and includes any necessary comments.
+
+Respond with multiple code blocks for different files, each clearly labeled with the filename.`;
+
+                // Create a File object from the uploaded image
+                const file = uploadedImage;
+                
+                // Send the user message with the image attachment
+                await window.Poe.sendUserMessage(prompt, {
+                    attachments: [file],
+                    handler: handlerId,
+                    stream: false,
+                    openChat: false
+                });
+            } catch (error) {
+                hideLoading();
+                console.error('Error sending message:', error);
+                
+                if (error.errorType === 'USER_REJECTED_CONFIRMATION') {
+                    alert('You need to allow Poe to access external resources for this functionality.');
+                } else {
+                    alert(`Error: ${error.message || 'An unknown error occurred'}`);
+                }
+            }
+        }
+
+        // Process generated code from the bot response
+        function processGeneratedCode(content, framework) {
+            // Extract file content from markdown response
+            const fileRegex = /```(?:(\w+)\s+)?(?:(?:\/\/|#) ([\w\/\-\.]+)\s*?|\s*?)([\s\S]*?)```/g;
+            const files = [];
+            
+            let match;
+            while ((match = fileRegex.exec(content)) !== null) {
+                const lang = match[1] || '';
+                const filename = match[2] || `file${files.length + 1}.${getDefaultExtension(framework, lang)}`;
+                const code = match[3];
+                
+                files.push({
+                    filename,
+                    lang: lang || getLanguageFromFilename(filename),
+                    code
+                });
+            }
+
+            if (files.length === 0) {
+                // If no code blocks were found, treat the entire response as a single file
+                const defaultExt = getDefaultExtension(framework);
+                files.push({
+                    filename: `main.${defaultExt}`,
+                    lang: getLanguageFromExtension(defaultExt),
+                    code: content
+                });
+            }
+
+            generatedFiles = files;
+            currentFileIndex = 0;
+            
+            // Update the UI
+            updateFilesDropdown();
+            updateCodeDisplay();
+            generatePreview(files, framework);
+            
+            // Show the code tab
+            tabCode.click();
+        }
+
+        // Update the files dropdown selector
+        function updateFilesDropdown() {
+            if (generatedFiles.length <= 1) {
+                fileSelector.classList.add('hidden');
+            } else {
+                fileSelector.classList.remove('hidden');
+                
+                // Clear existing options
+                fileDropdown.innerHTML = '';
+                
+                // Add new options
+                generatedFiles.forEach((file, index) => {
+                    const option = document.createElement('option');
+                    option.value = index;
+                    option.textContent = file.filename;
+                    fileDropdown.appendChild(option);
+                });
+            }
+        }
+
+        // Update the code display with the current file
+        function updateCodeDisplay() {
+            if (generatedFiles.length === 0) {
+                codePlaceholder.classList.remove('hidden');
+                codeResult.classList.add('hidden');
+                return;
+            }
+            
+            const file = generatedFiles[currentFileIndex];
+            currentFile.textContent = file.filename;
+            
+            // Set the code and language for syntax highlighting
+            codeDisplay.textContent = file.code;
+            codeDisplay.className = `language-${file.lang}`;
+            
+            // Apply syntax highlighting
+            hljs.highlightElement(codeDisplay);
+            
+            // Show the code result section
+            codePlaceholder.classList.add('hidden');
+            codeResult.classList.remove('hidden');
+        }
+
+        // Generate a preview of the UI based on the framework
+        function generatePreview(files, framework) {
+            const previewHtml = createPreviewHtml(files, framework);
+            
+            previewResult.innerHTML = previewHtml;
+            previewPlaceholder.classList.add('hidden');
+            previewResult.classList.remove('hidden');
+            previewResult.classList.add('preview-fade-in');
+        }
+
+        // Create a preview HTML based on the generated code and framework
+        function createPreviewHtml(files, framework) {
+            // For this demo, we'll just show a mockup preview
+            let previewImagePath;
+            
+            // Base the mockup on the selected framework
+            switch(framework) {
+                case 'NET MAUI':
+                case 'Blazor Hybrid':
+                    previewImagePath = 'https://i.imgur.com/xp7QIoM.png'; // .NET logo placeholder
+                    break;
+                case 'Flutter':
+                    previewImagePath = 'https://i.imgur.com/JzpTQWv.png'; // Flutter logo placeholder
+                    break;
+                case 'React Native':
+                    previewImagePath = 'https://i.imgur.com/n3EbqQi.png'; // React logo placeholder
+                    break;
+                default:
+                    previewImagePath = 'https://i.imgur.com/JzpTQWv.png';
+            }
+            
+            // Create a simplified preview with the uploaded image and a framework overlay
+            return `
+                <div class="flex flex-col items-center p-4">
+                    <h3 class="text-lg font-medium mb-4">Preview (${framework})</h3>
+                    <div class="relative border-2 border-gray-300 rounded-xl p-1 shadow-lg" style="max-width: 300px;">
+                        <div class="relative">
+                            <img src="${imagePreview.src}" class="rounded-lg max-w-full" alt="Original UI">
+                            <div class="absolute bottom-2 right-2 bg-white dark:bg-gray-800 p-1 rounded-lg shadow-md">
+                                <img src="${previewImagePath}" class="h-8 w-8" alt="${framework} Logo">
+                            </div>
+                        </div>
+                    </div>
+                    <p class="mt-4 text-sm text-center text-gray-600 dark:text-gray-400">
+                        This is a representation of how your UI would look in ${framework}.<br>
+                        The actual implementation may vary based on the framework's capabilities.
+                    </p>
+                </div>
+            `;
+        }
+
+        // Helper functions to determine file extensions and languages
+        function getDefaultExtension(framework, lang) {
+            if (lang) {
+                return getExtensionFromLanguage(lang);
+            }
+            
+            switch(framework) {
+                case 'NET MAUI':
+                    return 'xaml';
+                case 'Blazor Hybrid':
+                    return 'razor';
+                case 'Flutter':
+                    return 'dart';
+                case 'React Native':
+                    return 'jsx';
+                default:
+                    return 'txt';
+            }
+        }
+
+        function getExtensionFromLanguage(lang) {
+            const langMap = {
+                'dart': 'dart',
+                'xaml': 'xaml',
+                'csharp': 'cs',
+                'cs': 'cs',
+                'razor': 'razor',
+                'jsx': 'jsx',
+                'javascript': 'js',
+                'js': 'js',
+                'typescript': 'ts',
+                'ts': 'ts',
+                'json': 'json',
+                'xml': 'xml',
+                'html': 'html',
+                'css': 'css'
+            };
+            
+            return langMap[lang.toLowerCase()] || 'txt';
+        }
+
+        function getLanguageFromFilename(filename) {
+            const ext = filename.split('.').pop().toLowerCase();
+            return getLanguageFromExtension(ext);
+        }
+
+        function getLanguageFromExtension(ext) {
+            const extMap = {
+                'dart': 'dart',
+                'xaml': 'xml',
+                'cs': 'csharp',
+                'razor': 'cshtml',
+                'jsx': 'jsx',
+                'js': 'javascript',
+                'ts': 'typescript',
+                'json': 'json',
+                'xml': 'xml',
+                'html': 'html',
+                'css': 'css'
+            };
+            
+            return extMap[ext.toLowerCase()] || 'plaintext';
+        }
+
+        // Loading indicator functions
+        function showLoading(message) {
+            loadingMessage.textContent = message;
+            loadingOverlay.classList.remove('hidden');
+        }
+
+        function updateLoadingMessage(message) {
+            loadingMessage.textContent = message;
+        }
+
+        function hideLoading() {
+            loadingOverlay.classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
