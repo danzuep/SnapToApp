@@ -156,6 +156,10 @@
                                 Blazor Hybrid
                             </label>
                             <label class="flex items-center">
+                                <input type="radio" name="framework" value="Kotlin" class="mr-2">
+                                Kotlin
+                            </label>
+                            <label class="flex items-center">
                                 <input type="radio" name="framework" value="Flutter" class="mr-2">
                                 Flutter
                             </label>
@@ -583,51 +587,63 @@
             switch (framework) {
                 case 'NET MAUI':
                     docsHTML = `
-                            <h3 class="font-medium mb-2">.NET MAUI Resources:</h3>
-                            <ul class="space-y-1 text-sm">
-                                <li><a href="https://learn.microsoft.com/en-us/dotnet/maui/" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Official Documentation</a></li>
-                                <li><a href="https://learn.microsoft.com/en-us/dotnet/maui/get-started/installation" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Installation Guide</a></li>
-                                <li><a href="https://learn.microsoft.com/en-us/dotnet/maui/user-interface/controls/" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">UI Controls</a></li>
-                                <li><a href="https://learn.microsoft.com/en-us/dotnet/maui/android/deployment/" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Android Deployment</a></li>
-                                <li><a href="https://learn.microsoft.com/en-us/dotnet/maui/ios/deployment/" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">iOS Deployment</a></li>
-                            </ul>
-                        `;
+                        <h3 class="font-medium mb-2">.NET MAUI Resources:</h3>
+                        <ul class="space-y-1 text-sm">
+                        <li><a href="https://learn.microsoft.com/en-us/dotnet/maui/" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Official Documentation</a></li>
+                        <li><a href="https://learn.microsoft.com/en-us/dotnet/maui/get-started/installation" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Installation Guide</a></li>
+                        <li><a href="https://learn.microsoft.com/en-us/dotnet/maui/user-interface/controls/" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">UI Controls</a></li>
+                        <li><a href="https://learn.microsoft.com/en-us/dotnet/maui/android/deployment/" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Android Deployment</a></li>
+                        <li><a href="https://learn.microsoft.com/en-us/dotnet/maui/ios/deployment/" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">iOS Deployment</a></li>
+                        </ul>
+                    `;
                     break;
                 case 'Blazor Hybrid':
                     docsHTML = `
-                            <h3 class="font-medium mb-2">Blazor Hybrid Resources:</h3>
-                            <ul class="space-y-1 text-sm">
-                                <li><a href="https://learn.microsoft.com/en-us/aspnet/core/blazor/hybrid/" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Official Documentation</a></li>
-                                <li><a href="https://learn.microsoft.com/en-us/aspnet/core/blazor/hybrid/tutorials/maui" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Getting Started</a></li>
-                                <li><a href="https://learn.microsoft.com/en-us/aspnet/core/blazor/components/" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Components Reference</a></li>
-                                <li><a href="https://learn.microsoft.com/en-us/dotnet/maui/android/deployment/" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Android Deployment</a></li>
-                                <li><a href="https://learn.microsoft.com/en-us/dotnet/maui/ios/deployment/" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">iOS Deployment</a></li>
-                            </ul>
-                        `;
+                        <h3 class="font-medium mb-2">Blazor Hybrid Resources:</h3>
+                        <ul class="space-y-1 text-sm">
+                        <li><a href="https://learn.microsoft.com/en-us/aspnet/core/blazor/hybrid/" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Official Documentation</a></li>
+                        <li><a href="https://learn.microsoft.com/en-us/aspnet/core/blazor/hybrid/tutorials/maui" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Getting Started</a></li>
+                        <li><a href="https://learn.microsoft.com/en-us/aspnet/core/blazor/components/" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Components Reference</a></li>
+                        <li><a href="https://learn.microsoft.com/en-us/dotnet/maui/android/deployment/" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Android Deployment</a></li>
+                        <li><a href="https://learn.microsoft.com/en-us/dotnet/maui/ios/deployment/" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">iOS Deployment</a></li>
+                        </ul>
+                    `;
                     break;
                 case 'Flutter':
                     docsHTML = `
-                            <h3 class="font-medium mb-2">Flutter Resources:</h3>
-                            <ul class="space-y-1 text-sm">
-                                <li><a href="https://flutter.dev/docs" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Official Documentation</a></li>
-                                <li><a href="https://flutter.dev/docs/get-started/install" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Installation Guide</a></li>
-                                <li><a href="https://flutter.dev/docs/development/ui/widgets-intro" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Widget Catalog</a></li>
-                                <li><a href="https://flutter.dev/docs/deployment/android" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Android Deployment</a></li>
-                                <li><a href="https://flutter.dev/docs/deployment/ios" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">iOS Deployment</a></li>
-                            </ul>
-                        `;
+                        <h3 class="font-medium mb-2">Flutter Resources:</h3>
+                        <ul class="space-y-1 text-sm">
+                        <li><a href="https://flutter.dev/docs" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Official Documentation</a></li>
+                        <li><a href="https://flutter.dev/docs/get-started/install" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Installation Guide</a></li>
+                        <li><a href="https://flutter.dev/docs/development/ui/widgets-intro" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Widget Catalog</a></li>
+                        <li><a href="https://flutter.dev/docs/deployment/android" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Android Deployment</a></li>
+                        <li><a href="https://flutter.dev/docs/deployment/ios" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">iOS Deployment</a></li>
+                        </ul>
+                    `;
                     break;
                 case 'React Native':
                     docsHTML = `
-                            <h3 class="font-medium mb-2">React Native Resources:</h3>
-                            <ul class="space-y-1 text-sm">
-                                <li><a href="https://reactnative.dev/docs/getting-started" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Official Documentation</a></li>
-                                <li><a href="https://reactnative.dev/docs/environment-setup" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Environment Setup</a></li>
-                                <li><a href="https://reactnative.dev/docs/components-and-apis" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Components and APIs</a></li>
-                                <li><a href="https://reactnative.dev/docs/signed-apk-android" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Android Deployment</a></li>
-                                <li><a href="https://reactnative.dev/docs/publishing-to-app-store" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">iOS Deployment</a></li>
-                            </ul>
-                        `;
+                        <h3 class="font-medium mb-2">React Native Resources:</h3>
+                        <ul class="space-y-1 text-sm">
+                        <li><a href="https://reactnative.dev/docs/getting-started" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Official Documentation</a></li>
+                        <li><a href="https://reactnative.dev/docs/environment-setup" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Environment Setup</a></li>
+                        <li><a href="https://reactnative.dev/docs/components-and-apis" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Components and APIs</a></li>
+                        <li><a href="https://reactnative.dev/docs/signed-apk-android" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Android Deployment</a></li>
+                        <li><a href="https://reactnative.dev/docs/publishing-to-app-store" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">iOS Deployment</a></li>
+                        </ul>
+                    `;
+                    break;
+                case 'Kotlin':
+                    docsHTML = `
+                        <h3 class="font-medium mb-2">Kotlin Resources:</h3>
+                        <ul class="space-y-1 text-sm">
+                        <li><a href="https://kotlinlang.org/docs/home.html" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Official Documentation</a></li>
+                        <li><a href="https://developer.android.com/kotlin" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Kotlin for Android</a></li>
+                        <li><a href="https://kotlinlang.org/docs/tutorials.html" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Kotlin Tutorials</a></li>
+                        <li><a href="https://kotlinlang.org/docs/coding-conventions.html" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Coding Conventions</a></li>
+                        <li><a href="https://kotlinlang.org/docs/multiplatform.html" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">Multiplatform Programming</a></li>
+                        </ul>
+                    `;
                     break;
             }
 
@@ -822,6 +838,9 @@ Respond with multiple code blocks for different files, each clearly labeled with
                 case 'React Native':
                     previewImagePath = 'https://i.imgur.com/n3EbqQi.png'; // React logo placeholder
                     break;
+                case 'Kotlin':
+                    previewImagePath = 'https://i.imgur.com/5z5QK9M.png'; // Kotlin logo placeholder
+                    break;
                 default:
                     previewImagePath = 'https://i.imgur.com/JzpTQWv.png';
             }
@@ -857,6 +876,8 @@ Respond with multiple code blocks for different files, each clearly labeled with
                     return 'xaml';
                 case 'Blazor Hybrid':
                     return 'razor';
+                case 'Kotlin':
+                    return 'kt';
                 case 'Flutter':
                     return 'dart';
                 case 'React Native':
@@ -904,7 +925,9 @@ Respond with multiple code blocks for different files, each clearly labeled with
                 'json': 'json',
                 'xml': 'xml',
                 'html': 'html',
-                'css': 'css'
+                'css': 'css',
+                'kt': 'kotlin',
+                'kts': 'kotlin'
             };
 
             return extMap[ext.toLowerCase()] || 'plaintext';
